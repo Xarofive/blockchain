@@ -1,0 +1,76 @@
+= Архитектура проекта Blockchain project
+:toc:
+:toc-title: Содержание
+:icons: font
+:sectnums:
+
+== Общая схема
+Этот проект реализует блокчейн систему с собственной криптовалютой на базе Java 21 + Spring Boot, с использованием принципов *Clean Architecture*.
+В будущем проект будет разделён на микросервисы.
+
+== Слои архитектуры
+
+[cols="1,3"]
+|===
+| Слой | Описание
+
+| *Domain*
+| Бизнес-сущности и интерфейсы.
+  Содержит:
+  - `Block`
+  - `Transaction`
+  - `Wallet`
+  - интерфейсы репозиториев и сервисов
+
+| *Application*
+| Бизнес-кейсы (use cases).
+  Например:
+  - `AddBlockUseCase`
+  - `CreateTransactionUseCase`
+  Здесь нет инфраструктуры, только чистая логика.
+
+| *Infrastructure*
+| Реализация интерфейсов из `Domain`:
+  - Spring Data JPA репозитории
+  - HTTP-клиенты для общения между нодами
+  - реализация хранения блоков (PostgreSQL, JSON-файлы и др.)
+
+| *Adapters*
+| Входные точки в приложение:
+  - REST контроллеры (`Spring @RestController`)
+  - Kafka Consumers (по мере расширения)
+|===
+
+== Основные компоненты
+
+[plantuml, blockchain-arch, png]
+----
+@startuml
+package "ru.kata.blockchain" {
+  [Domain] --> [Application]
+  [Application] --> [Adapters]
+  [Application] --> [Infrastructure]
+}
+@enduml
+----
+
+== Пример зависимостей
+* Application зависит только от Domain.
+* Infrastructure реализует интерфейсы из Domain.
+* Adapters (например контроллеры) используют Application (use cases).
+
+== Будущее разделение
+После успешного MVP монолита:
+- Blockchain service → управляет блоками и цепочкой.
+- Transaction service → валидация и подписи транзакций.
+- Wallet service → управление ключами.
+- Node discovery / sync service → синхронизация нод.
+
+== Правила для команды
+* В Domain никаких Spring / SQL зависимостей!
+* Application знает только Domain.
+* Инфра не тянет контроллеры или use cases.
+* Контроллеры ничего не знают о базе.
+
+== Заключение
+Такое разделение позволяет потом **безболезненно вынести каждую часть в отдельный микросервис**, когда проект вырастет.
