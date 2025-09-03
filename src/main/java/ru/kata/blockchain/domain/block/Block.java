@@ -1,6 +1,7 @@
-package ru.kata.blockchain.domain;
+package ru.kata.blockchain.domain.block;
 
 import com.google.common.collect.ImmutableList;
+import ru.kata.blockchain.domain.transaction.Transaction;
 import ru.kata.blockchain.domain.vo.Hash;
 
 import java.time.Instant;
@@ -19,7 +20,6 @@ import java.time.Instant;
  * Блоки являются неизменяемыми (immutable). Хэш вычисляется автоматически на основе содержимого блока.
  * Используются в цепочке блоков, которая хранится и синхронизируется между узлами.
  */
-
 public record Block(long index, Instant timestamp, ImmutableList<Transaction> transactions, Hash previousHash,
                     long nonce, Hash hash) {
 

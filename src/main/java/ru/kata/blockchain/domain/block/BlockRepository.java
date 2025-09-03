@@ -1,6 +1,7 @@
-package ru.kata.blockchain.domain;
+package ru.kata.blockchain.domain.block;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Интерфейс репозитория для хранения и доступа к блокам блокчейна.
@@ -20,5 +21,5 @@ public interface BlockRepository {
     /**
      * Возвращает последний добавленный блок.
      */
-    Block findLatest();
+    Optional<Block> findLatest();
 }

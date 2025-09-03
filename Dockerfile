@@ -1,15 +1,15 @@
-FROM maven:3-jdk-8-alpine as builder
+FROM eclipse-temurin:21-jdk as builder
 
 WORKDIR /usr/src/app
 
-COPY . /usr/src/app
-RUN mvn package
+COPY gradlew gradlew.bat build.gradle settings.gradle ./
+COPY gradle ./gradle
+COPY src ./src
 
-FROM openjdk:8-jre-alpine
+RUN ./gradlew build --no-daemon
 
-COPY --from=builder /usr/src/app/target/*.jar /app.jar
+FROM eclipse-temurin:21-jre
 
 EXPOSE 8080
 
-ENTRYPOINT ["java"]
-CMD ["-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

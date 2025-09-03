@@ -1,7 +1,5 @@
 package ru.kata.blockchain.domain.vo;
 
-import lombok.NonNull;
-import lombok.Value;
 
 /**
  * Представляет адрес кошелька в системе блокчейн.

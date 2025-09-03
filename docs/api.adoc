@@ -1,0 +1,239 @@
+= Blockchain REST API — BlockchainRestController
+:toc:
+:toclevels: 3
+:sectanchors:
+:source-highlighter: highlightjs
+
+Документ описывает HTTP-эндпоинты контроллера `BlockchainRestController`, предназначенные для создания транзакций, чтения блокчейна и получения баланса адреса.
+
+== Модели данных (формат JSON)
+
+Ниже приведены примеры JSON для фактических моделей в ответах и запросах API:
+
+[cols="20,80"]
+|===
+| Тип | Поля
+
+| `WalletAddress`
+| `{"value": "addr1xyz123"}`
+
+| `Amount`
+| `{"value": 1500}`
+
+| `Hash`
+| `{"value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}`
+| `Transaction`
+|
+{
+"from": { "value": "addr1xyz123" },
+"to": { "value": "addr2abc456" },
+"amount": { "value": 1500 },
+"signature": "MEUCIQD1kF0v1y4h0WgZq0Y",
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE"
+}
+
+| `Block`
+|
+{
+"index": 2,
+"timestamp": "2025-08-26T12:00:00Z",
+"transactions": [ {
+"from": { "value": "addr1xyz123" },
+"to": { "value": "addr2abc456" },
+"amount": { "value": 1500 },
+"signature": "MEUCIQD1kF0v1y4h0WgZq0Y",
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE"
+} ],
+"previousHash": { "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+"nonce": 1,
+"hash": { "value": "9876543210abcdef9876543210abcdef9876543210abcdef9876543210abcdef" }
+}
+
+|===
+
+
+
+== POST /api/transaction — Создать транзакцию и добавить блок
+
+Создаёт транзакцию (подписывает приватным ключом), валидирует её и, при успехе, формирует новый блок.
+
+=== Запрос
+
+*Метод:* `POST` +
+*URL:* `/api/transaction` +
+*Тело:* JSON
+
+.Схема тела запроса
+[source,json]
+----
+{
+"transactionDto": {
+"from": "address1xyz123",
+"to": "address2abc456",
+"amount": 1500,
+"publicKey": "MFYwEAYHKoZIzj0C"
+},
+"privateKey": "MIGHAgEAMBMGByqGS"
+}
+----
+
+.Пример запроса (curl)
+[source,bash]
+----
+curl -X POST "http://localhost:8080/api/transaction" \
+-H "Content-Type: application/json" \
+-d '{
+"transactionDto": {
+"from": "address1xyz123",
+"to": "address2abc456",
+"amount": 1500,
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+},
+"privateKey": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAihRANCAARAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}'
+----
+
+=== Ответы:
+
+==== 200 OK (успех)
+
+Возвращается созданный блок, в который включена транзакция.
+
+.Пример ответа 200
+[source,json]
+----
+{
+"index": 2,
+"timestamp": "2025-08-26T12:00:00Z",
+"transactions": [
+{
+"from": { "value": "address1xyz123" },
+"to":   { "value": "address2abc456" },
+"amount": { "value": 1500 },
+"signature": "MEQCIFp0h5Q2k0xwC3v8S6c0c0+4d",
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}
+],
+"previousHash": { "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+"nonce": 1,
+"hash": { "value": "9876543210abcdef9876543210abcdef9876543210abcdef9876543210abcdef" }
+}
+----
+
+==== 400 Bad Request (валидация не пройдена / ошибка входных данных)
+
+Если транзакция не прошла проверки, возвращается объект результата валидации.
+
+.Пример ответа 400 (на этапе валидации)
+[source,json]
+----
+{
+"status": "ERROR",
+"txId": null,
+"errors": [ "INVALID_SIGNATURE", "INSUFFICIENT_FUNDS" ]
+}
+----
+
+.Пример ответа 400 (на этапе создания Transaction)
+[source,json]
+----
+{
+"message": "Transaction fields must not be null"
+}
+----
+
+== GET /api/blockchain — Получить всю цепочку блоков
+
+Возвращает текущий список блоков в порядке добавления.
+
+=== Запрос
+
+*Метод:* `GET` +
+*URL:* `/api/blockchain`
+
+.Пример запроса (curl)
+[source,bash]
+----
+curl -X GET "http://localhost:8080/api/blockchain"
+----
+
+=== Ответы
+
+==== 200 OK (успех)
+При запросе возвращается цепочка блоков в виде JSON, если на момент запуска программы файл не существует, то он будет создан
+
+.Пример ответа 200
+[source,json]
+----
+[
+{
+"index": 1,
+"timestamp": "2025-08-25T10:00:00Z",
+"transactions": [
+{
+"from": { "value": "addressFirst" },
+"to":   { "value": "addressSecond" },
+"amount": { "value": 1000 },
+"signature": "MEUCIQAAAA",
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAAAA"
+}
+],
+"previousHash": { "value": "0000000000000000000000000000000000000000000000000000000000000000" },
+"nonce": 1,
+"hash": { "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" }
+},
+{
+"index": 2,
+"timestamp": "2025-08-26T12:00:01Z",
+"transactions": [
+{
+"from": { "value": "address1" },
+"to":   { "value": "address2" },
+"amount": { "value": 1500 },
+"signature": "MEQCIFp0h5Q2k0xwC3v8S6c0c0+4d",
+"publicKey": "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEAAAAAAAA"
+}
+],
+"previousHash": { "value": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+"nonce": 1,
+"hash": { "value": "9876543210abcdef9876543210abcdef9876543210abcdef9876543210abcdef" }
+}
+]
+----
+
+== GET /api/balance/{address} — Получить баланс адреса
+
+Возвращает текущий баланс кошелька по адресу.
+
+=== Запрос
+
+*Метод:* `GET` +
+*URL:* `/api/balance/{address}`
+
+.Пример (curl)
+[source,bash]
+----
+curl -X GET "http://localhost:8080/api/balance/address1"
+----
+
+=== Ответы
+
+==== 200 OK (успех)
+
+Тело ответа — число с плавающей точкой (`double`), отражающее баланс указанного кошелька.
+
+.Пример ответа 200
+[source,json]
+----
+1500.70
+----
+
+==== 400 Bad Request (некорректный адрес)
+
+.Пример ответа 400
+[source,json]
+----
+{
+"message": "WalletAddress must be longer 30 symbols and shorter 128 symbols"
+}
+----

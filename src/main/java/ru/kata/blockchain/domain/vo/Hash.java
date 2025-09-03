@@ -21,4 +21,8 @@ public record Hash(String value) {
             throw new IllegalArgumentException("Invalid hash format: value must not be null or must be 64 hex characters [0-9a-f]");
         }
     }
+
+    public static Pattern getHexPattern() {
+        return HEX_PATTERN;
+    }
 }
