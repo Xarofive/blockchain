@@ -1,0 +1,19 @@
+plugins {
+    id 'com.github.node-gradle.node' version '7.0.2'
+}
+
+node {
+    download = true
+    version = '20.19.4'
+    npmVersion = '11.4.2'
+    nodeProjectDir = file('.')
+}
+
+tasks.register('npmBuild', com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn 'npmInstall'
+    args = ['run', 'build']
+}
+
+tasks.register('assemble') {
+    dependsOn 'npmBuild'
+}
