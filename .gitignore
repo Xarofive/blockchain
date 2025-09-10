@@ -26,7 +26,3 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-# Frontend
-frontend-web/node_modules/
-frontend-web/dist/

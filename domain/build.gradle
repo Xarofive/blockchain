@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api libs.jackson.databind
+    api libs.slf4j.api
+    api libs.guava
+    api libs.bouncycastle.provider
+}
+
+test {
+    useJUnitPlatform()
+}

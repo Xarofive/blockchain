@@ -1,2 +1,3 @@
 rootProject.name = 'blockchain'
-include('frontend-web')
+
+include(":domain", ":application", ":adapters", ":infrastructure")

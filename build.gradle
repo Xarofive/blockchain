@@ -1,46 +1,51 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.3'
-    id 'io.spring.dependency-management' version '1.1.4'
+    alias(libs.plugins.spring.boot) apply(false)
+    alias(libs.plugins.spring.dependency.management)
     id 'java'
     id 'checkstyle'
 }
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'io.spring.dependency-management'
 
-group = 'ru.kata'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '21'
-targetCompatibility = '21'
+    group = 'ru.kata'
 
-repositories {
-    mavenCentral()
-}
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
-checkstyle {
-    toolVersion = '10.12.5'
-    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
-    ignoreFailures = false
-    showViolations = true
+    repositories {
+        mavenCentral()
+    }
+
+    checkstyle {
+        toolVersion = libs.versions.checkstyle.get();
+        configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+        ignoreFailures = false
+        showViolations = true
+    }
+
+    dependencies {
+
+        implementation platform("org.springframework.boot:spring-boot-dependencies:3.2.3")
+
+        compileOnly libs.lombok
+        annotationProcessor libs.lombok
+
+        testImplementation libs.spring.boot.starter.test
+        testImplementation libs.junit.jupiter
+    }
+    test {
+        useJUnitPlatform()
+    }
 }
 
 tasks.named('check') {
-    dependsOn 'checkstyleMain'
+    dependsOn subprojects.collect { it.tasks.named('checkstyleMain') }
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
-    implementation 'org.slf4j:slf4j-api:2.0.13'
-    implementation 'ch.qos.logback:logback-classic:1.4.14'
-    implementation 'com.google.guava:guava:32.1.3-jre'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.17.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0'
-    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15to18
-    implementation("org.bouncycastle:bcprov-jdk15to18:1.76")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-}
-
-test {
-    useJUnitPlatform()
-}
+version = '0.0.1-SNAPSHOT'
+description = 'blockchain'

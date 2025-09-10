@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.boot)
+}
+
+dependencies {
+    implementation project(':adapters')
+    implementation project(':application')
+    implementation project(':domain')
+
+    implementation libs.spring.boot.starter.web
+
+    implementation libs.jackson.datatype.guava
+    implementation libs.jackson.datatype.jsr310
+}
+
+test {
+    useJUnitPlatform()
+}

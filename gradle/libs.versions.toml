@@ -1,0 +1,38 @@
+
+[versions]
+# Версии плагинов
+springBoot = "3.2.3"
+springDependencyManagement = "1.1.4"
+checkstyle = "10.12.5"
+
+# Версии библиотек
+lombok = "1.18.38"
+junitJupiter = "5.10.0"
+slf4j = "2.0.13"
+logback = "1.5.13"
+guava = "33.2.0-jre"
+jackson = "2.17.1"
+jacksonDatatypeGuava = "2.17.0"
+jacksonDatatypeJsr310 = "2.13.0"
+bouncycastle = "1.78"
+
+[libraries]
+# Библиотеки, которые мы будем использовать
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-datatype-guava = { module = "com.fasterxml.jackson.datatype:jackson-datatype-guava", version.ref = "jacksonDatatypeGuava" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonDatatypeJsr310" }
+bouncycastle-provider = { module = "org.bouncycastle:bcprov-jdk15to18", version.ref = "bouncycastle" }
+
+# Spring Boot зависимости
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+[plugins]
+# Плагины для сборки
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }

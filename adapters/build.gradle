@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    implementation project(':application')
+    implementation project(':domain')
+
+    implementation libs.spring.boot.starter.web
+    api libs.jackson.databind
+    implementation libs.jackson.datatype.guava
+    implementation libs.jackson.datatype.jsr310
+}
+
+test {
+    useJUnitPlatform()
+}
